@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.routers import users, rooms, bookings, payments, auth  # adjust path if needed
+
 app = FastAPI()
 
 origins = [
@@ -19,9 +21,9 @@ app.add_middleware(
 def home():
     return {"message": "Backend Working"}
 
-@app.get("/users")
-def get_users():
-    return [
-        {"id": 1, "name": "Rupesh"},
-        {"id": 2, "name": "Admin"}
-    ]
+# include routers
+app.include_router(users.router)
+app.include_router(rooms.router)
+app.include_router(bookings.router)
+app.include_router(payments.router)
+app.include_router(auth.router)
