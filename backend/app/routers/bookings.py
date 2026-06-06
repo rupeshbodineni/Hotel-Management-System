@@ -7,29 +7,20 @@ router = APIRouter(
     tags=["Bookings"]
 )
 
-# -------------------------
-# Schema (Model)
-# -------------------------
 class Booking(BaseModel):
-    id: int
+    
     user_name: str
     room_number: str
     check_in: str
     check_out: str
 
 
-# -------------------------
-# In-memory storage
-# -------------------------
 bookings: List[Booking] = []
 
 
-# -------------------------
-# CREATE booking
-# -------------------------
 @router.post("/", response_model=Booking)
 def create_booking(booking: Booking):
-    # check duplicate ID
+    
     for b in bookings:
         if b.id == booking.id:
             raise HTTPException(status_code=400, detail="Booking ID already exists")
@@ -38,17 +29,12 @@ def create_booking(booking: Booking):
     return booking
 
 
-# -------------------------
-# READ all bookings
-# -------------------------
 @router.get("/", response_model=List[Booking])
 def get_bookings():
     return bookings
 
 
-# -------------------------
-# READ single booking
-# -------------------------
+
 @router.get("/{booking_id}", response_model=Booking)
 def get_booking(booking_id: int):
     for b in bookings:
@@ -58,9 +44,6 @@ def get_booking(booking_id: int):
     raise HTTPException(status_code=404, detail="Booking not found")
 
 
-# -------------------------
-# UPDATE booking
-# -------------------------
 @router.put("/{booking_id}", response_model=Booking)
 def update_booking(booking_id: int, updated: Booking):
     for index, b in enumerate(bookings):
@@ -71,9 +54,6 @@ def update_booking(booking_id: int, updated: Booking):
     raise HTTPException(status_code=404, detail="Booking not found")
 
 
-# -------------------------
-# DELETE booking
-# -------------------------
 @router.delete("/{booking_id}")
 def delete_booking(booking_id: int):
     for index, b in enumerate(bookings):
