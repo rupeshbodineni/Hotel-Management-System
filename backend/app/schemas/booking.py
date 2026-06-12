@@ -10,10 +10,8 @@ class BookingBase(BaseModel):
     check_out_date: date
     total_amount: float
 
-
 class BookingCreate(BookingBase):
     pass
-
 
 class BookingResponse(BookingBase):
     booking_id: int

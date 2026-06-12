@@ -6,10 +6,8 @@ class PaymentBase(BaseModel):
     amount: float
     payment_method: str  
 
-
 class PaymentCreate(PaymentBase):
     pass
-
 
 class PaymentResponse(PaymentBase):
     payment_id: int

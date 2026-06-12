@@ -51,14 +51,11 @@ def login_user(payload: LoginSchema, response: Response, db: Session = Depends(g
     user = db.query(User).filter(User.email == payload.email).first()
     if not user:
         raise HTTPException(status_code=401, detail="Invalid email or password")
-
     # Check password
     if not verify_password(payload.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
-
     # Create JWT token
     token = create_access_token({"sub": user.email, "role": user.role})
-
     # Set httpOnly cookie
     response.set_cookie(
         key="access_token",
