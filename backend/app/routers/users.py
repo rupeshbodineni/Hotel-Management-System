@@ -13,6 +13,10 @@ router = APIRouter(
 
 @router.post("/")
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
+
+    print("Password =", user.password)
+    print("Length =", len(user.password))
+
     new_user = User(
         name=user.name,
         email=user.email,
@@ -23,14 +27,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    return {
-        "message": "User Created",
-        "data": {
-            "id": new_user.id,
-            "name": new_user.name,
-            "email": new_user.email
-        }
-    }
+    return {"message": "User Created"}
 
 
 @router.get("/")

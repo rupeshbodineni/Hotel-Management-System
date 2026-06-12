@@ -16,7 +16,7 @@ function Rooms() {
 
   return (
     <div>
-      <h2>Available Rooms</h2>
+      <h2 className="text-centre">Available Rooms</h2>
 
       {rooms.map((room) => (
         <RoomCard

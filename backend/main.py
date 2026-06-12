@@ -1,7 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import users, rooms, bookings, payments, auth  # adjust path if needed
+from app.routers import users, rooms, bookings, payments, auth
+
+# Import database engine and models
+from app.database.connection import engine,Base
+
+
+from app.models.user import User
+from app.models.room import Room
+from app.models.booking import Booking
+from app.models.payment import Payment
+
+# Create all tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -21,7 +33,6 @@ app.add_middleware(
 def home():
     return {"message": "Backend Working"}
 
-# include routers
 app.include_router(users.router)
 app.include_router(rooms.router)
 app.include_router(bookings.router)

@@ -1,7 +1,10 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const navigate = useNavigate();
+
   return (
     <>
       <Navbar />
@@ -9,11 +12,11 @@ function Home() {
       <section className="hero">
         <div className="hero-content">
           <h1>Luxury Hotel Booking</h1>
-          <p>
-            Find and book your perfect stay
-          </p>
+          <p>Find and book your perfect stay</p>
 
-          <button>Explore Rooms</button>
+          <button onClick={() => navigate("/rooms")}>
+            Explore Rooms
+          </button>
         </div>
       </section>
 
