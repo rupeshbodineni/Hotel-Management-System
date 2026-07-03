@@ -20,8 +20,6 @@ function Register() {
       });
 
       alert("Registration Successful");
-
-      // clear form after success
       setName("");
       setEmail("");
       setPassword("");

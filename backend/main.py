@@ -1,9 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-
 from app.database.connection import engine, Base
-
 from app.routers import users, rooms, bookings, payments, auth
 
 app = FastAPI(title="Hotel Management System")
