@@ -1,51 +1,78 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
 from typing import List
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
+from app.database.connection import get_db
+from app.models.room import Room
+from app.schemas.room import RoomCreate, RoomResponse
 
 router = APIRouter(
     prefix="/rooms",
     tags=["Rooms"]
 )
 
-class Room(BaseModel):
-    
-    room_number: str
-    room_type: str
-    price: float
+@router.post("/", response_model=RoomResponse, status_code=201)
+def create_room(
+    payload: RoomCreate,
+    db: Session = Depends(get_db)
+):
+    existing_room = (
+        db.query(Room)
+        .filter(Room.room_number == payload.room_number)
+        .first()
+    )
 
-rooms: List[Room] = []
+    if existing_room:
+        raise HTTPException(
+            status_code=400,
+            detail="Room already exists"
+        )
 
-@router.post("/", response_model=Room)
-def create_room(room: Room):
-    for r in rooms:
-        if r.id == room.id:
-            raise HTTPException(status_code=400, detail="Room already exists")
-    rooms.append(room)
+    new_room = Room(**payload.dict())
+    db.add(new_room)
+    db.commit()
+    db.refresh(new_room)
+    return new_room
+
+
+@router.get("/", response_model=List[RoomResponse])
+def get_rooms(db: Session = Depends(get_db)):
+    return db.query(Room).all()
+
+
+@router.get("/{room_id}", response_model=RoomResponse)
+def get_room(room_id: int, db: Session = Depends(get_db)):
+    room = db.query(Room).filter(Room.id == room_id).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
     return room
 
-@router.get("/", response_model=List[Room])
-def get_rooms():
-    return rooms
 
-@router.get("/{room_id}", response_model=Room)
-def get_room(room_id: int):
-    for r in rooms:
-        if r.id == room_id:
-            return r
-    raise HTTPException(status_code=404, detail="Room not found")
+@router.put("/{room_id}", response_model=RoomResponse)
+def update_room(
+    room_id: int,
+    payload: RoomCreate,
+    db: Session = Depends(get_db)
+):
+    room = db.query(Room).filter(Room.id == room_id).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
 
-@router.put("/{room_id}", response_model=Room)
-def update_room(room_id: int, updated: Room):
-    for i, r in enumerate(rooms):
-        if r.id == room_id:
-            rooms[i] = updated
-            return updated
-    raise HTTPException(status_code=404, detail="Room not found")
+    for key, value in payload.dict().items():
+        setattr(room, key, value)
+
+    db.commit()
+    db.refresh(room)
+    return room
+
 
 @router.delete("/{room_id}")
-def delete_room(room_id: int):
-    for i, r in enumerate(rooms):
-        if r.id == room_id:
-            rooms.pop(i)
-            return {"message": "Room deleted"}
-    raise HTTPException(status_code=404, detail="Room not found")
+def delete_room(room_id: int, db: Session = Depends(get_db)):
+    room = db.query(Room).filter(Room.id == room_id).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Room not found")
+
+    db.delete(room)
+    db.commit()
+    return {"message": "Room deleted"}

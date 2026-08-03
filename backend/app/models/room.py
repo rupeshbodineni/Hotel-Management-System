@@ -1,10 +1,10 @@
-from sqlalchemy import Column,Integer,String,Float
-from .user import Base
+from sqlalchemy import Column, Float, Integer, String
+from app.database.connection import Base
 
 class Room(Base):
     __tablename__ = "rooms"
-    id = Column(Integer, primary_key=True,index=True)
-    room_number = Column(String)
-    room_type = Column(String)
-    price = Column(Float)
-    status = Column(String, default="available")
+    id = Column(Integer, primary_key=True, index=True)
+    room_number = Column(String, unique=True, nullable=False)
+    room_type = Column(String, nullable=False)
+    price = Column(Float, nullable=False)
+    status = Column(String, default="available", nullable=False)

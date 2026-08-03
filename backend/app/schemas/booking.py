@@ -1,21 +1,24 @@
-from pydantic import BaseModel
-from datetime import date, datetime
+from datetime import date
 from typing import Optional
+from pydantic import BaseModel
 
-class BookingBase(BaseModel):
+class BookingCreate(BaseModel):
+    room_id: int
+    customer_name: Optional[str] = None
+    customer_email: Optional[str] = None
+    check_in: Optional[date] = None
+    check_out: Optional[date] = None
+    total_amount: Optional[float] = None
+
+class BookingResponse(BaseModel):
+    id: int
+    room_id: int
     customer_name: str
     customer_email: str
-    room_id: int
-    check_in_date: date
-    check_out_date: date
+    check_in: date
+    check_out: date
     total_amount: float
-
-class BookingCreate(BookingBase):
-    pass
-
-class BookingResponse(BookingBase):
-    booking_id: int
-    booking_status: str
+    status: str
 
     class Config:
         from_attributes = True
