@@ -7,6 +7,12 @@ import Rooms from "../pages/Rooms";
 import Booking from "../pages/Booking";
 import Dashboard from "../pages/Dashboard";
 import Admin from "../pages/Admin";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
+import Reception from "../pages/Reception";
+import Housekeeping from "../pages/Housekeeping";
+import Restaurant from "../pages/Restaurant";
+import Services from "../pages/Services";
 
 function AppRoutes() {
   return (
@@ -18,6 +24,12 @@ function AppRoutes() {
       <Route path="/booking/:id" element={<Booking />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route style={{wordBreak: "break-all"}} path="/reset-password" element={<ResetPassword />} />
+      <Route path="/reception" element={<Reception />} />
+      <Route path="/housekeeping" element={<Housekeeping />} />
+      <Route path="/restaurant" element={<Restaurant />} />
+      <Route path="/services" element={<Services />} />
     </Routes>
   );
 }

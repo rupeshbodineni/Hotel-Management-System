@@ -9,4 +9,9 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column("password", String, nullable=False)
     role = Column(String, default="customer", nullable=False)
+    phone = Column(String, nullable=True)
+    address = Column(String, nullable=True)
+    photo = Column(String, nullable=True)
+    preferences = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
