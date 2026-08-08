@@ -1,9 +1,10 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 function Navbar() {
   const { user, logout } = useContext(AuthContext);
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -18,36 +19,49 @@ function Navbar() {
         <span style={styles.brandPost}>Oasis</span>
       </Link>
 
-      <div style={styles.links}>
-        <Link style={styles.link} to="/">Home</Link>
-        <Link style={styles.link} to="/rooms">Rooms</Link>
-        <Link style={styles.link} to="/restaurant">Restaurant</Link>
-        <Link style={styles.link} to="/services">Services</Link>
+      <button
+        aria-label="Toggle navigation"
+        className="navbar-toggle"
+        onClick={() => setOpen((s) => !s)}
+        style={styles.toggleBtn}
+      >
+        <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="22" height="2" rx="1" fill="white" />
+          <rect y="7" width="22" height="2" rx="1" fill="white" />
+          <rect y="14" width="22" height="2" rx="1" fill="white" />
+        </svg>
+      </button>
+
+      <div className={`nav-links ${open ? "open" : ""}`} style={styles.links}>
+        <Link onClick={() => setOpen(false)} style={styles.link} to="/">Home</Link>
+        <Link onClick={() => setOpen(false)} style={styles.link} to="/rooms">Rooms</Link>
+        <Link onClick={() => setOpen(false)} style={styles.link} to="/restaurant">Restaurant</Link>
+        <Link onClick={() => setOpen(false)} style={styles.link} to="/services">Services</Link>
 
         {user && user.role === "admin" && (
-          <Link style={styles.adminLink} to="/admin">Admin Panel</Link>
+          <Link onClick={() => setOpen(false)} style={styles.adminLink} to="/admin">Admin Panel</Link>
         )}
         {user && user.role === "receptionist" && (
-          <Link style={styles.adminLink} to="/reception">Reception Desk</Link>
+          <Link onClick={() => setOpen(false)} style={styles.adminLink} to="/reception">Reception Desk</Link>
         )}
         {user && user.role === "housekeeping" && (
-          <Link style={styles.adminLink} to="/housekeeping">Housekeeping</Link>
+          <Link onClick={() => setOpen(false)} style={styles.adminLink} to="/housekeeping">Housekeeping</Link>
         )}
         {user && user.role === "customer" && (
-          <Link style={styles.userLink} to="/dashboard">My Dashboard</Link>
+          <Link onClick={() => setOpen(false)} style={styles.userLink} to="/dashboard">My Dashboard</Link>
         )}
 
         {!user ? (
           <>
-            <Link style={styles.link} to="/login">Login</Link>
-            <Link style={styles.goldBtn} to="/register">Register</Link>
+            <Link onClick={() => setOpen(false)} style={styles.link} to="/login">Login</Link>
+            <Link onClick={() => setOpen(false)} style={styles.goldBtn} to="/register">Register</Link>
           </>
         ) : (
           <div style={styles.userSection}>
             <span style={styles.userGreeting}>
               Hi, <span style={styles.userName}>{user.name}</span>
             </span>
-            <button style={styles.logoutBtn} onClick={handleLogout}>
+            <button style={styles.logoutBtn} onClick={() => { setOpen(false); handleLogout(); }}>
               Logout
             </button>
           </div>

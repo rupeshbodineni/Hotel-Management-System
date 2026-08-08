@@ -281,6 +281,25 @@ a {
   to { transform: translateX(0) translateY(0); opacity: 1; }
 }
 
+/* Responsive Navbar Toggle */
+.navbar-toggle {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+@media (max-width: 768px) {
+  .navbar-toggle { display: inline-flex; align-items: center; justify-content: center; }
+
+  .nav-links { display: none; position: absolute; top: 64px; right: 16px; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 12px; border-radius: 8px; flex-direction: column; gap: 12px; min-width: 200px; z-index: 200; }
+  .nav-links.open { display: flex; }
+
+  .nav-links a { padding: 8px 10px; }
+  .nav-links .userSection { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+
 /* Tabs System */
 .tabs-header {
   display: flex;
