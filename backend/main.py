@@ -1,13 +1,37 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import date, timedelta
 
 from app.database.connection import engine, Base, SessionLocal
-from app.routers import users, rooms, bookings, payments, auth, reviews, restaurant, services, staff, settings, analytics
+from app.routers import users, rooms, bookings, payments, auth, reviews, restaurant, services, staff, settings, analytics, chatbot
 
-app = FastAPI(title="Luxury Hotel Management System API")
 
-origins = ["http://localhost:5173"]
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Create database tables and seed data
+    Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    try:
+        seed_database(db)
+    finally:
+        db.close()
+    yield
+    # Shutdown: (cleanup if needed)
+
+
+app = FastAPI(
+    title="Luxury Hotel Management System API",
+    description="Complete REST API for The Royal Oasis Hotel Management System",
+    version="2.0.0",
+    lifespan=lifespan
+)
+
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,24 +41,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-def on_startup():
-    # Create database tables
-    Base.metadata.create_all(bind=engine)
-    
-    # Auto-seed database with default records for immediate usability
-    db = SessionLocal()
-    try:
-        seed_database(db)
-    finally:
-        db.close()
 
 @app.get("/")
 def home():
     return {
         "message": "Luxury Hotel Management System API Working",
-        "documentation": "/docs"
+        "documentation": "/docs",
+        "version": "2.0.0"
     }
+
 
 # Include routers
 app.include_router(auth.router)
@@ -48,6 +63,7 @@ app.include_router(services.router)
 app.include_router(staff.router)
 app.include_router(settings.router)
 app.include_router(analytics.router)
+app.include_router(chatbot.router)
 
 
 def seed_database(db):

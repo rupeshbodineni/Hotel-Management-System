@@ -6,7 +6,7 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("customer");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -14,6 +14,16 @@ function Register() {
 
   const register = async (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
     try {
       setLoading(true);
       setError("");
@@ -22,7 +32,7 @@ function Register() {
         name,
         email,
         password,
-        role,
+        role: "customer", // Public registration is always customer for security
       });
 
       alert("Registration Successful! Please login.");
@@ -71,28 +81,25 @@ function Register() {
             <label>PASSWORD</label>
             <input
               type="password"
-              placeholder="••••••••"
+              placeholder="At least 6 characters"
               className="luxury-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
             />
           </div>
 
           <div className="luxury-input-group">
-            <label>SELECT ROLE</label>
-            <select
-              className="luxury-select"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              style={styles.select}
-            >
-              <option value="customer">Customer</option>
-              <option value="receptionist">Receptionist</option>
-              <option value="housekeeping">Housekeeping</option>
-              <option value="admin">Admin</option>
-              <option value="manager">Manager</option>
-            </select>
+            <label>CONFIRM PASSWORD</label>
+            <input
+              type="password"
+              placeholder="Re-enter your password"
+              className="luxury-input"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
           </div>
 
           <button type="submit" className="gold-btn" style={styles.btn} disabled={loading}>
@@ -103,6 +110,7 @@ function Register() {
         <div style={styles.footerLink}>
           Already have an account? <Link to="/login" style={styles.goldLink}>Login</Link>
         </div>
+        <p style={styles.staffNote}>Staff accounts are created by hotel administration.</p>
       </div>
     </div>
   );
@@ -156,8 +164,10 @@ const styles = {
     color: "#c5a880",
     fontWeight: "600",
   },
-  select: {
-    backgroundColor: "#141a2b",
+  staffNote: {
+    marginTop: "12px",
+    fontSize: "11px",
+    color: "#4a5568",
   }
 };
 

@@ -30,7 +30,7 @@ function Login() {
       });
 
       // Redirect depending on user role
-      if (res.data.role === "admin") {
+      if (res.data.role === "admin" || res.data.role === "manager") {
         navigate("/admin");
       } else if (res.data.role === "receptionist") {
         navigate("/reception");
