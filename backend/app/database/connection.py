@@ -14,16 +14,22 @@ DB_PORT = os.getenv("DB_PORT", "3306")
 DB_NAME = os.getenv("DB_NAME", "hotel_management")
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# Treat placeholder/example passwords as "not set"
+_PLACEHOLDER = "your_mysql_password_here"
+if DB_PASSWORD == _PLACEHOLDER:
+    DB_PASSWORD = ""
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 if not DATABASE_URL:
     if DB_PASSWORD:
-        # MySQL connection when credentials are provided (local dev)
+        # Real MySQL credentials provided (local dev / production MySQL)
         DATABASE_URL = (
             f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
             "?charset=utf8mb4"
         )
     else:
-        # SQLite fallback for Render / environments without MySQL
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        # SQLite fallback — works on Render free tier with no external DB
         DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'hotel.db')}"
 
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
