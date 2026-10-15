@@ -25,7 +25,7 @@ function AppRoutes() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route style={{wordBreak: "break-all"}} path="/reset-password" element={<ResetPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/reception" element={<Reception />} />
       <Route path="/housekeeping" element={<Housekeeping />} />
       <Route path="/restaurant" element={<Restaurant />} />

@@ -1,5 +1,6 @@
-import { useState, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
 import API from "../services/api";
 import { AuthContext } from "../context/AuthContext";
 
@@ -12,36 +13,39 @@ function Login() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    setLoading(true);
+    setError("");
+
     try {
-      setLoading(true);
-      setError("");
-      const res = await API.post("/auth/login", {
+      const response = await API.post("/auth/login", { email, password });
+      const user = {
+        name: response.data.name,
+        role: response.data.role,
         email,
-        password,
-      });
+      };
 
-      // Save token and user info inside AuthContext reactively
-      login(res.data.access_token, {
-        name: res.data.name,
-        role: res.data.role,
-        email: email
-      });
+      login(response.data.access_token, user);
 
-      // Redirect depending on user role
-      if (res.data.role === "admin" || res.data.role === "manager") {
+      if (["admin", "manager"].includes(response.data.role)) {
         navigate("/admin");
-      } else if (res.data.role === "receptionist") {
-        navigate("/reception");
-      } else if (res.data.role === "housekeeping") {
-        navigate("/housekeeping");
-      } else {
-        navigate("/dashboard");
+        return;
       }
-      
-    } catch (error) {
-      console.error(error);
+
+      if (response.data.role === "receptionist") {
+        navigate("/reception");
+        return;
+      }
+
+      if (response.data.role === "housekeeping") {
+        navigate("/housekeeping");
+        return;
+      }
+
+      navigate("/dashboard");
+    } catch (loginError) {
+      console.error(loginError);
       setError("Invalid email or password. Please try again.");
     } finally {
       setLoading(false);
@@ -52,18 +56,18 @@ function Login() {
     <div style={styles.container}>
       <div className="glass-panel" style={styles.card}>
         <h2 style={styles.title}>Welcome Back</h2>
-        <p style={styles.subtitle}>Log in to access your luxury suite reservation dashboard.</p>
-        
+        <p style={styles.subtitle}>Log in to access your hotel dashboard.</p>
+
         {error && <div style={styles.error}>{error}</div>}
 
         <form onSubmit={handleLogin} className="luxury-form">
           <div className="luxury-input-group">
-            <label>EMAIL ADDRESS</label>
+            <label>Email Address</label>
             <input
               type="email"
+              value={email}
               placeholder="name@example.com"
               className="luxury-input"
-              value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
@@ -71,26 +75,26 @@ function Login() {
 
           <div className="luxury-input-group">
             <div style={styles.passwordHeader}>
-              <label>PASSWORD</label>
+              <label>Password</label>
               <Link to="/forgot-password" style={styles.forgotLink}>Forgot?</Link>
             </div>
             <input
               type="password"
+              value={password}
               placeholder="••••••••"
               className="luxury-input"
-              value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
 
-          <button type="submit" className="gold-btn" style={styles.btn} disabled={loading}>
+          <button type="submit" className="gold-btn" style={styles.button} disabled={loading}>
             {loading ? "Authenticating..." : "Login"}
           </button>
         </form>
 
-        <div style={styles.footerLink}>
-          Don't have an account? <Link to="/register" style={styles.goldLink}>Register</Link>
+        <div style={styles.footerText}>
+          Don&apos;t have an account? <Link to="/register" style={styles.link}>Register</Link>
         </div>
       </div>
     </div>
@@ -141,16 +145,16 @@ const styles = {
     fontSize: "12px",
     color: "#c5a880",
   },
-  btn: {
+  button: {
     width: "100%",
     justifyContent: "center",
   },
-  footerLink: {
+  footerText: {
     marginTop: "24px",
     fontSize: "14px",
     color: "#a0aec0",
   },
-  goldLink: {
+  link: {
     color: "#c5a880",
     fontWeight: "600",
   },
