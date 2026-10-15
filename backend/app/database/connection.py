@@ -1,36 +1,39 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
 import os
-from sqlalchemy.exc import OperationalError
-from datetime import timedelta
+from urllib.parse import quote_plus
+
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
+DB_USER = os.getenv("DB_USER", "root")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = os.getenv("DB_PORT", "3306")
+DB_NAME = os.getenv("DB_NAME", "hotel_management")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-connect_args = {}
-if DATABASE_URL.startswith("sqlite"):
-    connect_args["check_same_thread"] = False
+if not DATABASE_URL:
+    if DB_PASSWORD:
+        # MySQL connection when credentials are provided (local dev)
+        DATABASE_URL = (
+            f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASSWORD)}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+            "?charset=utf8mb4"
+        )
+    else:
+        # SQLite fallback for Render / environments without MySQL
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'hotel.db')}"
+
+connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,
+    future=True,
     connect_args=connect_args,
 )
-
-# If the configured database is unreachable, fall back to local SQLite for development.
-try:
-    with engine.connect() as conn:
-        pass
-except OperationalError:
-    DATABASE_URL = "sqlite:///./test.db"
-    connect_args = {"check_same_thread": False}
-    engine = create_engine(
-        DATABASE_URL,
-        pool_pre_ping=True,
-        connect_args=connect_args,
-    )
 
 SessionLocal = sessionmaker(
     autocommit=False,
