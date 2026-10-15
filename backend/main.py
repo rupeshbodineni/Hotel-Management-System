@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Luxury Hotel Management System API",
     description="Complete REST API for The Royal Oasis Hotel Management System",
-    version="2.0.0",
+    version="2.1.0",
     lifespan=lifespan,
 )
 
@@ -62,7 +62,8 @@ def home():
     return {
         "message": "Luxury Hotel Management System API Working",
         "documentation": "/docs",
-        "version": "2.0.0",
+        "version": "2.1.0",
+        "db": "sqlite-fallback",
     }
 
 
